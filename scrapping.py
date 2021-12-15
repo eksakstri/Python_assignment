@@ -54,7 +54,8 @@ def D(func):
             else:
                 a = C[0]
                 user = Person(name, a, D, y)
-                return user.show()
+                op = user.show()
+                return op
     return inner
          
 @D
