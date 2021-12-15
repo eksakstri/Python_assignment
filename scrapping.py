@@ -13,17 +13,20 @@ class Person:
             self.username = username
             self.name = name
             self.city = city
-            if len(work) != 0:
+            if len(work) != 0 or work !=None:
                 self.work = work
+                self.Work = work[0]
             self.City = city[0] 
-            self.Work = work[0]
-
+            
         def show(self):
             show_this = "My name is {} and my current city is {}".format(self.name, self.City)
-            #print(f"Checkpoint 1")
-            #print(show_this)
-            #print(f"Checkpoint 2")
+            print(show_this)
             return show_this
+        
+        def add(self):
+            A=db.cursor()
+            A.execute("UPDATE user SET name = %s, city = %s WHERE username = %s",(self.name, self.City, self.username))
+            db.commit()
 
 def D(func):
     def inner(name):
@@ -31,14 +34,27 @@ def D(func):
         query="SELECT username FROM user WHERE username = %s"
         A.execute(query,(name,))
         B=A.fetchone()
-        C=A.fetchall()
-        if B==None:
+        query1="SELECT name FROM user WHERE username = %s"
+        A.execute(query1,(name,))
+        C=A.fetchone()
+        #print(type(C))
+        query2="SELECT city FROM user WHERE username = %s"
+        A.execute(query2,(name,))
+        D=A.fetchone()
+        x = ""
+        y = ["No work"]
+        if B == None:
             x = "Name not found!!!"
             print(x)
             return x
         else:
-            x = func(name) 
-            return x  
+            if C == ('Saksham',):
+                x = func(name)
+                return x
+            else:
+                a = C[0]
+                user = Person(name, a, D, y)
+                return user.show()
     return inner
          
 @D
@@ -68,11 +84,6 @@ def scrapping(name):
     driver.get(url1)
     time.sleep(3)
     work = []
-    """all_keys = driver.find_elements_by_xpath("//span[@class='d2edcug0 hpfvmrgz qv66sw1b c1et5uql b0tq1wua a8c37x1j keod5gw0 nxhoafnm aigsh9s9 d9wwppkn fe6kdd0r mau55g9w c8b282yb hrzyx87i jq4qci2q a3bd9o3v b1v8xokw oo9gr5id']")
-    for span in all_keys:
-        lis.append = span.text
-        a = a+1
-    b = 0"""
     all_values1 = driver.find_elements_by_xpath("//span[@class='nc684nl6']")
     for span in all_values1:
         work.append(span.text)
@@ -88,9 +99,8 @@ def scrapping(name):
     user = Person(name,Name,city,work) 
     url3 = url +"/likes"
     driver.get(url3)
-    fav = ([])
+    fav = []
     all_values3 = driver.find_elements_by_class_name('d2edcug0 hpfvmrgz qv66sw1b c1et5uql b0tq1wua a8c37x1j keod5gw0 nxhoafnm aigsh9s9 fe6kdd0r mau55g9w c8b282yb d9wwppkn hrzyx87i jq4qci2q a3bd9o3v lrazzd5p oo9gr5id hzawbc8m')
-    time.sleep(10)
     for span in all_values3:
         fav.append(span.text)
     if len(fav) == 0:
@@ -99,6 +109,9 @@ def scrapping(name):
     else:
         #print("No favourites!!!")
         pass
+    #print(f"Checkpoint 3")
+    user.add()
+    #print(f"Checkpoint 4")
     driver.quit()
     op = user.show()
     #print(op)
@@ -106,22 +119,10 @@ def scrapping(name):
 
     #print(f"Checkpoint 4")
 
-scrapping(name) 
+def username():
+    name = input("Enter username: ")
+    scrapping(name) 
 
-"""def username():
-    name=input("Enter the username:")
-    check(name)
-
-def check(name):
-    A=db.cursor()
-    query="SELECT username FROM user WHERE username = %s"
-    A.execute(query,(name,))
-    B=A.fetchone()
-    if B==None:
-        print("ERROR")
-    else: 
-        scrapping(name)"""
-
+username()
 #print(f"Checkpoint 3")
-
 
